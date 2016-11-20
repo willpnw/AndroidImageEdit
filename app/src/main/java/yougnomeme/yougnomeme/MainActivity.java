@@ -13,12 +13,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setUpSeekBar();
-        ((ImageView)findViewById(R.id.uxImageView)).setScaleX((float)0.5);
+        setUpSeekBars();
     }
 
-    private void setUpSeekBar() {
-        ((SeekBar)findViewById(R.id.uxSeekBar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    private void setUpSeekBars() {
+        ((ImageView)findViewById(R.id.uxImageView)).setScaleX((float)0.5);
+        ((ImageView)findViewById(R.id.uxImageView)).setScaleY((float)0.5);
+        ((SeekBar)findViewById(R.id.uxSeekBarW)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Log.d("Progres", new Integer(progress).toString());
@@ -32,7 +33,22 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+        ((SeekBar)findViewById(R.id.uxSeekBarH)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d("Progres", new Integer(progress).toString());
+                ((ImageView)findViewById(R.id.uxImageView)).setScaleY(((float)progress)/100);
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
     }

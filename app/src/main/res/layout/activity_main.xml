@@ -20,7 +20,13 @@
         android:src="@drawable/gnome"/>
     <SeekBar
         android:progress="50"
-        android:id="@+id/uxSeekBar"
+        android:id="@+id/uxSeekBarW"
+        android:layout_width="match_parent"
+        android:secondaryProgress="100"
+        android:layout_height="wrap_content"/>
+    <SeekBar
+        android:progress="50"
+        android:id="@+id/uxSeekBarH"
         android:layout_width="match_parent"
         android:secondaryProgress="100"
         android:layout_height="wrap_content"/>
