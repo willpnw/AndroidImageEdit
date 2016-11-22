@@ -32,9 +32,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpSeekBars() {
-        ((ImageView)findViewById(R.id.uxImageView)).setScaleX((float)0.5);
-        ((ImageView)findViewById(R.id.uxImageView)).setScaleY((float)0.5);
-
         ((SeekBar)findViewById(R.id.uxSeekBarW)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -141,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
         ((ImageView)findViewById(R.id.uxImageView)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "The favorite list would appear on clicking this icon", Toast.LENGTH_LONG).show();
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
             }
@@ -152,6 +148,15 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             ((ImageView)findViewById(R.id.uxImageView)).setImageBitmap(photo);
+
+            // Set up the view
+            ((SeekBar)findViewById(R.id.uxSeekBarW)).setProgress(100);
+            ((SeekBar)findViewById(R.id.uxSeekBarH)).setProgress(100);
+            ((SeekBar)findViewById(R.id.uxSeekBarA)).setProgress(0);
+            ((SeekBar)findViewById(R.id.uxSeekBarR)).setProgress(0);
+            ((SeekBar)findViewById(R.id.uxSeekBarG)).setProgress(0);
+            ((SeekBar)findViewById(R.id.uxSeekBarB)).setProgress(0);
+            findViewById(R.id.uxSliders).setVisibility(View.VISIBLE);
         }
     }
 }
