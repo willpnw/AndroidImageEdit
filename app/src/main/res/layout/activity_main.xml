@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:scaleType="fitCenter"
         android:layout_weight="1"
-        android:src="@drawable/gnome"/>
+        android:src="@drawable/camera"/>
     <SeekBar
         android:progress="50"
         android:id="@+id/uxSeekBarW"
