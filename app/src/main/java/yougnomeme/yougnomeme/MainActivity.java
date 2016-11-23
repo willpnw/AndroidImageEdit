@@ -4,20 +4,24 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private static final int CAMERA_REQUEST = 1888;
-
+    SensorManager sensorManager  = null;
     int alpha = 0;
     int red = 0;
     int green = 0;
@@ -29,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setUpSeekBars();
         setupImageView();
+        setupSave();
+        setupSensors();
     }
 
     private void setUpSeekBars() {
@@ -147,7 +153,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
-            ((ImageView)findViewById(R.id.uxImageView)).setImageBitmap(photo);
+            ImageView imageView = (ImageView)findViewById(R.id.uxImageView);
+            imageView.setImageBitmap(photo);
 
             // Set up the view
             ((SeekBar)findViewById(R.id.uxSeekBarW)).setProgress(100);
@@ -157,6 +164,53 @@ public class MainActivity extends AppCompatActivity {
             ((SeekBar)findViewById(R.id.uxSeekBarG)).setProgress(0);
             ((SeekBar)findViewById(R.id.uxSeekBarB)).setProgress(0);
             findViewById(R.id.uxSliders).setVisibility(View.VISIBLE);
+            findViewById(R.id.uxSave).setVisibility(View.VISIBLE);
+            findViewById(R.id.uxInstruct).setVisibility(View.GONE);
         }
+    }
+
+    private void setupSave() {
+        ((Button)findViewById(R.id.uxSave)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Button button = (Button) findViewById(R.id.uxSave);
+                String mode = (String) button.getText();
+                button.setText(mode == "Manual" ? "Rotation" : "Manual");
+
+                ImageView imageView = (ImageView)findViewById(R.id.uxImageView);
+                imageView.setDrawingCacheEnabled(true);
+                Bitmap b = imageView.getDrawingCache();
+                String res = MediaStore.Images.Media.insertImage(getContentResolver(), b,"MyTitle", "MyDescription");
+
+                Toast.makeText(MainActivity.this, mode, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupSensors() {
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Log.d("Sensor", event.toString());
+        if(((Button)findViewById(R.id.uxSave)).getText() == "Manual")  {
+            if (event.sensor.getType()==Sensor.TYPE_ORIENTATION){
+                int r = (int)(((event.values[0])*100)/360);
+                int g = (int)(((event.values[1]+180)*100)/360);
+                int b = (int)(((event.values[2]+90)*100)/180);
+                ((SeekBar)findViewById(R.id.uxSeekBarR)).setProgress(r);
+                ((SeekBar)findViewById(R.id.uxSeekBarG)).setProgress(g);
+                ((SeekBar)findViewById(R.id.uxSeekBarB)).setProgress(b);
+                Log.d("RGB: ", String.valueOf(r) + " " + String.valueOf(g) + " " + String.valueOf(b));
+            }
+        }
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }

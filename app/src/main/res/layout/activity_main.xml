@@ -11,6 +11,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     tools:context="yougnomeme.yougnomeme.MainActivity">
+    <TextView
+        android:id="@+id/uxInstruct"
+        android:textSize="24sp"
+        android:textAlignment="center"
+        android:text="Tap Icon To Take Photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <ImageView
         android:id="@+id/uxImageView"
         android:layout_width="match_parent"
@@ -95,4 +102,10 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
     </LinearLayout>
+    <Button
+        android:visibility="gone"
+        android:id="@+id/uxSave"
+        android:text="Use Rotation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>
