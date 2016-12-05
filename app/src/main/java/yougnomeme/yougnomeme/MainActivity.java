@@ -2,6 +2,7 @@ package yougnomeme.yougnomeme;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
+    public static final String FILTER_PREFS = "FilterPrefs";
     private static final int CAMERA_REQUEST = 1888;
     SensorManager sensorManager  = null;
     int alpha = 0;
@@ -33,16 +35,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         setUpSeekBars();
         setupImageView();
-        setupSave();
+        setupButtons();
         setupSensors();
     }
 
     private void setUpSeekBars() {
+        restorePrefs();
         ((SeekBar)findViewById(R.id.uxSeekBarW)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("Progres", new Integer(progress).toString());
-                ((ImageView)findViewById(R.id.uxImageView)).setScaleX(((float)progress)/100);
+                (findViewById(R.id.uxImageView)).setScaleX(((float)progress)/100);
             }
 
             @Override
@@ -57,8 +59,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ((SeekBar)findViewById(R.id.uxSeekBarH)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("Progres", new Integer(progress).toString());
-                ((ImageView)findViewById(R.id.uxImageView)).setScaleY(((float)progress)/100);
+                (findViewById(R.id.uxImageView)).setScaleY(((float)progress)/100);
             }
 
             @Override
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ((SeekBar)findViewById(R.id.uxSeekBarA)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("Progres", new Integer(progress).toString());
                 alpha = 255 * progress / 100;
                 ((ImageView)findViewById(R.id.uxImageView)).setColorFilter(Color.argb(alpha, red, green, blue));
             }
@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ((SeekBar)findViewById(R.id.uxSeekBarR)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("Progres", new Integer(progress).toString());
                 red = 255 * progress / 100;
                 ((ImageView)findViewById(R.id.uxImageView)).setColorFilter(Color.argb(alpha, red, green, blue));
             }
@@ -107,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ((SeekBar)findViewById(R.id.uxSeekBarG)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("Progres", new Integer(progress).toString());
                 green = 255 * progress / 100;
                 ((ImageView)findViewById(R.id.uxImageView)).setColorFilter(Color.argb(alpha, red, green, blue));
             }
@@ -124,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ((SeekBar)findViewById(R.id.uxSeekBarB)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("Progres", new Integer(progress).toString());
                 blue = 255 * progress / 100;
                 ((ImageView)findViewById(R.id.uxImageView)).setColorFilter(Color.argb(alpha, red, green, blue));
             }
@@ -140,8 +137,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
     }
 
+    private void restorePrefs() {
+        SharedPreferences prefs = getSharedPreferences(FILTER_PREFS, 0);
+        ((SeekBar)findViewById(R.id.uxSeekBarW)).setProgress(prefs.getInt("width", 100));
+        ((SeekBar)findViewById(R.id.uxSeekBarH)).setProgress(prefs.getInt("height", 100));
+        ((SeekBar)findViewById(R.id.uxSeekBarA)).setProgress(prefs.getInt("alpha", 0));
+        ((SeekBar)findViewById(R.id.uxSeekBarR)).setProgress(prefs.getInt("red", 0));
+        ((SeekBar)findViewById(R.id.uxSeekBarG)).setProgress(prefs.getInt("green", 0));
+        ((SeekBar)findViewById(R.id.uxSeekBarB)).setProgress(prefs.getInt("blue", 0));
+        ((Button)findViewById(R.id.uxRotate)).setText(prefs.getBoolean("rotate", false) ? "Manual" : "Rotate");
+    }
+
     private void setupImageView() {
-        ((ImageView)findViewById(R.id.uxImageView)).setOnClickListener(new View.OnClickListener() {
+        (findViewById(R.id.uxImageView)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -156,32 +164,36 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             ImageView imageView = (ImageView)findViewById(R.id.uxImageView);
             imageView.setImageBitmap(photo);
 
-            // Set up the view
-            ((SeekBar)findViewById(R.id.uxSeekBarW)).setProgress(100);
-            ((SeekBar)findViewById(R.id.uxSeekBarH)).setProgress(100);
-            ((SeekBar)findViewById(R.id.uxSeekBarA)).setProgress(0);
-            ((SeekBar)findViewById(R.id.uxSeekBarR)).setProgress(0);
-            ((SeekBar)findViewById(R.id.uxSeekBarG)).setProgress(0);
-            ((SeekBar)findViewById(R.id.uxSeekBarB)).setProgress(0);
             findViewById(R.id.uxSliders).setVisibility(View.VISIBLE);
-            findViewById(R.id.uxSave).setVisibility(View.VISIBLE);
+            findViewById(R.id.uxButtons).setVisibility(View.VISIBLE);
             findViewById(R.id.uxInstruct).setVisibility(View.GONE);
         }
     }
 
-    private void setupSave() {
-        ((Button)findViewById(R.id.uxSave)).setOnClickListener(new View.OnClickListener() {
+    private void setupButtons() {
+        (findViewById(R.id.uxSave)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Button button = (Button) findViewById(R.id.uxSave);
+                SharedPreferences settings = getSharedPreferences(FILTER_PREFS, 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putInt("width", ((SeekBar)findViewById(R.id.uxSeekBarW)).getProgress());
+                editor.putInt("height",((SeekBar)findViewById(R.id.uxSeekBarH)).getProgress());
+                editor.putInt("alpha", ((SeekBar)findViewById(R.id.uxSeekBarA)).getProgress());
+                editor.putInt("red",   ((SeekBar)findViewById(R.id.uxSeekBarR)).getProgress());
+                editor.putInt("green", ((SeekBar)findViewById(R.id.uxSeekBarG)).getProgress());
+                editor.putInt("blue",  ((SeekBar)findViewById(R.id.uxSeekBarB)).getProgress());
+                editor.putBoolean("rotate", ((Button)findViewById(R.id.uxRotate)).getText() == "Rotate" ? false : true);
+                editor.commit();
+                Toast.makeText(MainActivity.this, "Settings Saved", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        (findViewById(R.id.uxRotate)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Button button = (Button) findViewById(R.id.uxRotate);
                 String mode = (String) button.getText();
                 button.setText(mode == "Manual" ? "Rotation" : "Manual");
-
-                ImageView imageView = (ImageView)findViewById(R.id.uxImageView);
-                imageView.setDrawingCacheEnabled(true);
-                Bitmap b = imageView.getDrawingCache();
-                String res = MediaStore.Images.Media.insertImage(getContentResolver(), b,"MyTitle", "MyDescription");
-
                 Toast.makeText(MainActivity.this, mode, Toast.LENGTH_SHORT).show();
             }
         });
@@ -194,8 +206,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Log.d("Sensor", event.toString());
-        if(((Button)findViewById(R.id.uxSave)).getText() == "Manual")  {
+        if(((Button)findViewById(R.id.uxRotate)).getText() == "Manual")  {
             if (event.sensor.getType()==Sensor.TYPE_ORIENTATION){
                 int r = (int)(((event.values[0])*100)/360);
                 int g = (int)(((event.values[1]+180)*100)/360);
@@ -203,7 +214,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 ((SeekBar)findViewById(R.id.uxSeekBarR)).setProgress(r);
                 ((SeekBar)findViewById(R.id.uxSeekBarG)).setProgress(g);
                 ((SeekBar)findViewById(R.id.uxSeekBarB)).setProgress(b);
-                Log.d("RGB: ", String.valueOf(r) + " " + String.valueOf(g) + " " + String.valueOf(b));
             }
         }
 

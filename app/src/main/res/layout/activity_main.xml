@@ -102,10 +102,22 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
     </LinearLayout>
-    <Button
+    <LinearLayout
+        android:id="@+id/uxButtons"
         android:visibility="gone"
-        android:id="@+id/uxSave"
-        android:text="Use Rotation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/uxRotate"
+            android:text="Rotation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <Button
+            android:id="@+id/uxSave"
+            android:text="Save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+    </LinearLayout>
 </LinearLayout>
